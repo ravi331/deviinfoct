@@ -1,25 +1,25 @@
 import streamlit as st
+import pandas as pd
 import random
-from utils import load_csv, normalize_number, safe_path
+from utils import normalize_number
 
 def login_sidebar():
     ss = st.session_state
-   
+
+    # Load and normalize allowed users
     allowed_df = pd.read_csv("allowed_users.csv")
     allowed_df["mobile_number"] = normalize_number(allowed_df["mobile_number"])
 
-    mobile = normalize_number(pd.Series([entered_number])).iloc[0]
-
-# 🔍 Debug output
-    st.write("Entered:", mobile)
-    st.write("Allowed:", allowed_df["mobile_number"].tolist())
-
-    match = allowed_df[allowed_df["mobile_number"] == mobile]
-
-
     st.sidebar.title("Login")
+
     if not ss.get("logged_in"):
-        mobile = st.sidebar.text_input("Enter 10-digit mobile number").strip()[-10:]
+        entered_number = st.sidebar.text_input("Enter 10-digit mobile number")
+        mobile = normalize_number(pd.Series([entered_number])).iloc[0]
+
+        # 🔍 Debug output
+        st.write("Entered:", mobile)
+        st.write("Allowed:", allowed_df["mobile_number"].tolist())
+
         if st.sidebar.button("Send OTP"):
             if mobile in allowed_df["mobile_number"].values:
                 ss.otp = str(random.randint(100000, 999999))
@@ -28,6 +28,7 @@ def login_sidebar():
                 st.sidebar.success(f"OTP (Test Mode): {ss.otp}")
             else:
                 st.sidebar.error("❌ Number not registered")
+
         if ss.get("otp"):
             otp_entered = st.sidebar.text_input("Enter OTP")
             if st.sidebar.button("Verify OTP"):
@@ -39,7 +40,6 @@ def login_sidebar():
     else:
         st.sidebar.success(f"Logged in as: {ss.mobile} ({ss.role})")
         if st.sidebar.button("Logout"):
-            for k in ["logged_in", "mobile", "otp", "welcomed", "admin_logged_in", "role"]:
+            for k in ["logged_in", "mobile", "otp", "role"]:
                 ss.pop(k, None)
             st.experimental_rerun()
-
