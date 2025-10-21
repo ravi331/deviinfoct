@@ -42,4 +42,4 @@ def login_sidebar():
         if st.sidebar.button("Logout"):
             for k in ["logged_in", "mobile", "otp", "role"]:
                 ss.pop(k, None)
-            st.experimental_rerun()
+            st.rerun()
