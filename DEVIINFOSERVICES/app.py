@@ -77,7 +77,8 @@ if ss.get("logged_in"):
         st.header("🖼️ Event Gallery")
 
         if ss.get("role") == "admin":
-            uploaded = st.file_uploader("Upload event photo", type=["png", "jpg", "jpeg"])
+            uploaded = st.file_uploader("Upload photo or video", type=["png", "jpg", "jpeg", "mp4", "mov"])
+
             if uploaded:
                 os.makedirs("gallery", exist_ok=True)
                 save_path = os.path.join("gallery", uploaded.name)
@@ -93,6 +94,7 @@ if ss.get("logged_in"):
             st.info("No gallery images yet.")
 else:
     st.warning("🔒 Please log in to access the portal.")
+
 
 
 
