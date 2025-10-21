@@ -8,6 +8,11 @@ from registration import register_student
 
 st.set_page_config(page_title="Annual Day Portal", layout="wide")
 login_sidebar()
+if st.session_state.get("logged_in"):
+    if st.sidebar.button("Logout"):
+        st.session_state.clear()
+        st.experimental_rerun()
+
 ss = st.session_state
 
 if ss.get("logged_in"):
@@ -85,3 +90,4 @@ if ss.get("logged_in"):
             st.info("No gallery images yet.")
 else:
     st.warning("🔒 Please log in to access the portal.")
+
