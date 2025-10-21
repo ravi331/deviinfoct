@@ -35,5 +35,7 @@ def post_announcement():
             df.loc[len(df)] = [datetime.now(), title, msg, by]
             df.to_csv(safe_path("notices.csv"), index=False)
             st.success("✅ Announcement Posted")
-            st.rerun()
+            st.experimental_rerun()
+
+
 
