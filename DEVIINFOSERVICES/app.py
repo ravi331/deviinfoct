@@ -54,6 +54,8 @@ if ss.get("logged_in"):
         if ss.get("role") == "admin":
             st.divider()
             post_announcement()
+            manage_announcements()
+
 
     # Registration tab
     with tabs[2]:
@@ -91,5 +93,6 @@ if ss.get("logged_in"):
             st.info("No gallery images yet.")
 else:
     st.warning("🔒 Please log in to access the portal.")
+
 
 
