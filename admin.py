@@ -1,41 +1,34 @@
 import streamlit as st
-from utils import load_csv, safe_path
+import pandas as pd
+import os
 from datetime import datetime
-
-# Admin password stored securely in .streamlit/secrets.toml
-ADMIN_PASSWORD = st.secrets["admin"]["password"]
-
-def admin_panel():
-    ss = st.session_state
-    st.header("Admin Panel")
-
-    if not ss.get("admin_logged_in"):
-        pw = st.text_input("Enter Admin Password", type="password")
-        if st.button("Login"):
-            if pw == ADMIN_PASSWORD:
-                ss.admin_logged_in = True
-                st.success("✅ Admin Logged In")
-            else:
-                st.error("❌ Wrong Password")
-    else:
-        st.success("✅ You are logged in as Admin")
-        if st.button("Logout Admin"):
-            ss.admin_logged_in = False
-            st.experimental_rerun()
 
 def post_announcement():
     ss = st.session_state
-    if ss.get("admin_logged_in"):
-        st.subheader("Post Announcement (Admin Only)")
-        title = st.text_input("Title")
-        msg = st.text_area("Message")
-        by = st.text_input("Posted By", "Admin")
-        if st.button("Post Announcement"):
-            df = load_csv(safe_path("notices.csv"), ["Timestamp", "Title", "Message", "PostedBy"])
-            df.loc[len(df)] = [datetime.now(), title, msg, by]
-            df.to_csv(safe_path("notices.csv"), index=False)
-            st.success("✅ Announcement Posted")
-            st.experimental_rerun()
 
+    if ss.get("role") != "admin":
+        st.warning("🚫 Only admins can post announcements.")
+        return
 
+    st.subheader("📢 Post New Announcement")
+    message = st.text_area("Enter your announcement")
 
+    if st.button("Post"):
+        if message.strip():
+            # Load existing announcements
+            if os.path.exists("announcements.csv"):
+                df = pd.read_csv("announcements.csv")
+            else:
+                df = pd.DataFrame(columns=["timestamp", "message"])
+
+            # Add new announcement at the top
+            new_entry = {
+                "timestamp": datetime.now().isoformat(),
+                "message": message.strip()
+            }
+            df = pd.concat([pd.DataFrame([new_entry]), df], ignore_index=True)
+            df.to_csv("announcements.csv", index=False)
+            st.success("✅ Announcement posted!")
+            st.rerun()
+        else:
+            st.error("❌ Message cannot be empty.")
