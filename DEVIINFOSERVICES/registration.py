@@ -1,37 +1,49 @@
 import streamlit as st
-from utils import load_csv, safe_path
+import pandas as pd
+import os
 from datetime import datetime
 
-def registration_form():
-    st.header("Register for Annual Day Event")
+def register_student():
+    ss = st.session_state
 
-    with st.form("register_form"):
-        ss = st.session_state
-        name = st.text_input("Student Name")
-        clas = st.text_input("Class")
-        sec = st.text_input("Section")
-        item = st.text_input("Event/Item")
-        addr = st.text_area("Address")
-        bus = st.radio("Using Bus?", ["Yes", "No"])
-        contact = st.text_input("Contact", value=ss.get("mobile", ""))
+    st.subheader("📝 Student Registration")
 
-        if st.form_submit_button("Submit"):
-            df = load_csv(
-                safe_path("registrations.csv"),
-                ["Timestamp", "Name", "Class", "Section", "Item", "Address", "Bus", "Contact", "Status"]
-            )
-            df.loc[len(df)] = [
-                datetime.now(), name, clas, sec, item, addr, bus, contact, "Pending"
-            ]
-            df.to_csv(safe_path("registrations.csv"), index=False)
-            st.success("✅ Registered Successfully!")
+    with st.form("registration_form"):
+        name = st.text_input("Name")
+        student_class = st.selectbox("Class", ["Nursery", "LKG", "UKG"] + [str(i) for i in range(1, 13)])
+        section = st.text_input("Section")
+        item = st.text_input("Item (e.g., Dance, Skit, Speech)")
+        address = st.text_area("Address")
+        bus = st.selectbox("Bus Required?", ["Yes", "No"])
+        contact = st.text_input("Contact Number")
+        status = st.selectbox("Status", ["Confirmed", "Pending"])
 
-    st.subheader("Registered Students")
-    data = load_csv(
-        safe_path("registrations.csv"),
-        ["Timestamp", "Name", "Class", "Section", "Item", "Address", "Bus", "Contact", "Status"]
-    )
-    st.dataframe(data, use_container_width=True)
+        submitted = st.form_submit_button("Submit")
 
-    csv_data = data.to_csv(index=False).encode("utf-8")
-    st.download_button("⬇ Download CSV", csv_data, "registrations.csv", "text/csv")
+    if submitted:
+        if name.strip() and contact.strip():
+            new_entry = {
+                "timestamp": datetime.now().isoformat(),
+                "name": name.strip(),
+                "class": student_class,
+                "section": section.strip(),
+                "item": item.strip(),
+                "address": address.strip(),
+                "bus": bus,
+                "contact": contact.strip(),
+                "status": status
+            }
+
+            # Load existing data
+            if os.path.exists("registrations.csv"):
+                df = pd.read_csv("registrations.csv")
+            else:
+                df = pd.DataFrame(columns=new_entry.keys())
+
+            # Add new entry at the top
+            df = pd.concat([pd.DataFrame([new_entry]), df], ignore_index=True)
+            df.to_csv("registrations.csv", index=False)
+            st.success("✅ Registration submitted!")
+            st.rerun()
+        else:
+            st.error("❌ Name and Contact are required.")
