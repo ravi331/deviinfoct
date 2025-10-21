@@ -1,40 +1,23 @@
 import streamlit as st
-from utils import load_csv, safe_path
-from datetime import datetime
-
-# Admin password stored securely in .streamlit/secrets.toml
-ADMIN_PASSWORD = st.secrets["admin"]["password"]
-
-def admin_panel():
-    ss = st.session_state
-    st.header("Admin Panel")
-
-    if not ss.get("admin_logged_in"):
-        pw = st.text_input("Enter Admin Password", type="password")
-        if st.button("Login"):
-            if pw == ADMIN_PASSWORD:
-                ss.admin_logged_in = True
-                st.success("✅ Admin Logged In")
-            else:
-                st.error("❌ Wrong Password")
-    else:
-        st.success("✅ You are logged in as Admin")
-        if st.button("Logout Admin"):
-            ss.admin_logged_in = False
-            st.experimental_rerun()
+import pandas as pd
+import os
 
 def post_announcement():
-    ss = st.session_state
-    if ss.get("admin_logged_in"):
-        st.subheader("Post Announcement (Admin Only)")
-        title = st.text_input("Title")
-        msg = st.text_area("Message")
-        by = st.text_input("Posted By", "Admin")
-        if st.button("Post Announcement"):
-            df = load_csv(safe_path("notices.csv"), ["Timestamp", "Title", "Message", "PostedBy"])
-            df.loc[len(df)] = [datetime.now(), title, msg, by]
-            df.to_csv(safe_path("notices.csv"), index=False)
-            st.success("✅ Announcement Posted")
-            st.experimental_rerun()
+    st.subheader("📢 Post a New Announcement")
+    message = st.text_area("Announcement Message")
 
+    if st.button("Post Announcement"):
+        if message.strip():
+            new_announcement = pd.DataFrame([{"message": message.strip()}])
 
+            # Append to existing file or create new
+            if os.path.exists("announcements.csv"):
+                existing = pd.read_csv("announcements.csv")
+                combined = pd.concat([existing, new_announcement], ignore_index=True)
+            else:
+                combined = new_announcement
+
+            combined.to_csv("announcements.csv", index=False)
+            st.success("✅ Announcement posted!")
+        else:
+            st.warning("Please enter a message before posting.")
