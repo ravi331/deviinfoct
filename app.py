@@ -21,7 +21,7 @@ if not ss.get("welcomed"):
     st.image("images/mascot.png", width=250)
     st.subheader(f"🎉 Welcome, {ss.mobile}!")
     ss.welcomed = True
-    st.experimental_rerun()
+    st.rerun()
 
 # ==================== TABS ====================
 tabs = ["Home", "Registration", "Gallery", "Announcements"]
@@ -81,3 +81,4 @@ if ss.get("role") == "teacher":
 if ss.get("role") == "student":
     with tab_objs[4]:
         student_dashboard()
+
