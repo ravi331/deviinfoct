@@ -19,5 +19,24 @@ def post_announcement():
 
             combined.to_csv("announcements.csv", index=False)
             st.success("✅ Announcement posted!")
+def manage_announcements():
+    st.subheader("📋 Manage Announcements")
+
+    if os.path.exists("announcements.csv"):
+        df = pd.read_csv("announcements.csv")
+        if not df.empty:
+            for i, row in df[::-1].iterrows():
+                st.info(f"📢 {row['message']}")
+                if st.button(f"🗑️ Delete", key=f"del_{i}"):
+                    df.drop(index=i, inplace=True)
+                    df.to_csv("announcements.csv", index=False)
+                    st.success("✅ Announcement deleted")
+                    st.experimental_rerun()
+        else:
+            st.info("No announcements yet.")
+    else:
+        st.info("No announcements file found.")
+
         else:
             st.warning("Please enter a message before posting.")
+
