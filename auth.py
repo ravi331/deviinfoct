@@ -11,7 +11,7 @@ def login_sidebar():
         if mobile:
             try:
                 df = pd.read_csv("allowed_users.csv")
-                user = df[df["mobile"] == mobile]
+                user = df[df["mobile_number"] == mobile]
                 if not user.empty:
                     st.session_state["logged_in"] = True
                     st.session_state["mobile"] = mobile
