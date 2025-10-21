@@ -15,11 +15,12 @@ def login_sidebar():
                 if not user.empty:
                     st.session_state["logged_in"] = True
                     st.session_state["mobile"] = mobile
+                    st.session_state["name"] = user.iloc[0]["name"]
                     st.session_state["role"] = user.iloc[0]["role"]
-                    st.sidebar.success(f"✅ Logged in as {user.iloc[0]['role']}")
+                    st.sidebar.success(f"✅ Logged in as {user.iloc[0]['name']} ({user.iloc[0]['role']})")
                 else:
                     st.sidebar.error("❌ Mobile number not found")
             except Exception as e:
-                st.sidebar.error("⚠️ Error loading user data")
+                st.sidebar.error(f"⚠️ Error loading user data: {e}")
         else:
             st.sidebar.warning("Please enter your mobile number")
