@@ -6,12 +6,10 @@ from auth import login_sidebar
 from admin import post_announcement
 from registration import register_student
 
-# Page setup
 st.set_page_config(page_title="Annual Day Portal", layout="wide")
 login_sidebar()
 ss = st.session_state
 
-# Logged-in view
 if ss.get("logged_in"):
     st.title("🎓 Welcome to St. Gregorios School Portal")
     st.success(f"Logged in as: {ss.mobile} ({ss.role})")
@@ -23,7 +21,7 @@ if ss.get("logged_in"):
     else:
         st.warning("Mascot image not found.")
 
-    # Countdown timer to 20 December 2025, 6:00 PM
+    # Countdown to 20 Dec 2025, 6:00 PM
     event_date = datetime(2025, 12, 20, 18, 0)
     now = datetime.now()
     remaining = event_date - now
@@ -45,11 +43,10 @@ if ss.get("logged_in"):
         if os.path.exists("announcements.csv"):
             df = pd.read_csv("announcements.csv")
             for _, row in df.iterrows():
-                st.info(row["message"])
+                st.info(f"📢 {row['message']}")
         else:
             st.info("No announcements yet.")
 
-        # Admin-only: Post announcement
         if ss.get("role") == "admin":
             st.divider()
             post_announcement()
@@ -58,7 +55,6 @@ if ss.get("logged_in"):
     with tabs[2]:
         register_student()
 
-        # Admin-only: View registered students
         if ss.get("role") == "admin":
             st.header("📋 Registered Students")
             if os.path.exists("registrations.csv"):
@@ -75,8 +71,21 @@ if ss.get("logged_in"):
     # Gallery tab
     with tabs[3]:
         st.header("🖼️ Event Gallery")
-        st.info("Gallery feature coming soon!")
 
-# Not logged in
+        if ss.get("role") == "admin":
+            uploaded = st.file_uploader("Upload event photo", type=["png", "jpg", "jpeg"])
+            if uploaded:
+                os.makedirs("gallery", exist_ok=True)
+                save_path = os.path.join("gallery", uploaded.name)
+                with open(save_path, "wb") as f:
+                    f.write(uploaded.getbuffer())
+                st.success("✅ Photo uploaded!")
+
+        if os.path.exists("gallery"):
+            images = [f for f in os.listdir("gallery") if f.lower().endswith((".png", ".jpg", ".jpeg"))]
+            for img in images:
+                st.image(os.path.join("gallery", img), use_column_width=True)
+        else:
+            st.info("No gallery images yet.")
 else:
     st.warning("🔒 Please log in to access the portal.")
