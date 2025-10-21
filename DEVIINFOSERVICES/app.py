@@ -45,8 +45,9 @@ if ss.get("logged_in"):
         st.header("📢 Announcements")
         if os.path.exists("announcements.csv"):
             df = pd.read_csv("announcements.csv")
-            for _, row in df.iterrows():
+            for _, row in df[::-1].iterrows():
                 st.info(f"📢 {row['message']}")
+
         else:
             st.info("No announcements yet.")
 
@@ -90,4 +91,5 @@ if ss.get("logged_in"):
             st.info("No gallery images yet.")
 else:
     st.warning("🔒 Please log in to access the portal.")
+
 
