@@ -20,7 +20,8 @@ if ss.get("logged_in"):
         st.image(mascot_path, width=200)
 
     # Countdown timer
-    event_date = datetime(2025, 11, 15, 18, 0)  # Example: Nov 15, 6 PM
+    event_date = datetime(2025, 12, 20, 18, 0)  # ✅ Correct: Dec 20, 6 PM
+
     now = datetime.now()
     remaining = event_date - now
     days, seconds = remaining.days, remaining.seconds
@@ -66,3 +67,4 @@ if ss.get("logged_in"):
         st.info("Gallery feature coming soon!")
 else:
     st.warning("🔒 Please log in to access the portal.")
+
