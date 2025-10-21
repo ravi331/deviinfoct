@@ -21,11 +21,10 @@ def load_csv(file, columns):
 def normalize_number(series):
     return (
         series.astype(str)
-        .str.replace(" ", "", regex=False)
-        .str.replace("+91", "", regex=False)
-        .str.strip()
+        .str.replace(r"\D", "", regex=True)  # removes all non-digits
         .str[-10:]
     )
+
 
 def ensure_gallery():
     if not os.path.exists(GALLERY_DIR):
@@ -47,3 +46,4 @@ def time_remaining():
     hours, rem = divmod(diff.seconds, 3600)
     mins, secs = divmod(rem, 60)
     return f"{days} days, {hours} hrs, {mins} mins, {secs} secs"
+
