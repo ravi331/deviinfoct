@@ -3,17 +3,18 @@ import pandas as pd
 import os
 from datetime import datetime
 from auth import login_sidebar
-from admin import post_announcement
+from admin import post_announcement, manage_announcements
 from registration import register_student
 
 st.set_page_config(page_title="Annual Day Portal", layout="wide")
 login_sidebar()
-if st.session_state.get("logged_in"):
+ss = st.session_state
+
+# Logout button
+if ss.get("logged_in"):
     if st.sidebar.button("Logout"):
         st.session_state.clear()
         st.experimental_rerun()
-
-ss = st.session_state
 
 if ss.get("logged_in"):
     st.title("🎓 Welcome to St. Gregorios School Portal")
@@ -45,9 +46,8 @@ if ss.get("logged_in"):
         st.header("📢 Announcements")
         if os.path.exists("announcements.csv"):
             df = pd.read_csv("announcements.csv")
-            for _, row in df[::-1].iterrows():
+            for _, row in df[::-1].iterrows():  # Show latest first
                 st.info(f"📢 {row['message']}")
-
         else:
             st.info("No announcements yet.")
 
@@ -55,7 +55,6 @@ if ss.get("logged_in"):
             st.divider()
             post_announcement()
             manage_announcements()
-
 
     # Registration tab
     with tabs[2]:
@@ -66,7 +65,7 @@ if ss.get("logged_in"):
             if os.path.exists("registrations.csv"):
                 df = pd.read_csv("registrations.csv")
                 if not df.empty:
-                    st.dataframe(df)
+                    st.dataframe(df, use_container_width=True)
                     csv_data = df.to_csv(index=False).encode("utf-8")
                     st.download_button("Download CSV", data=csv_data, file_name="registrations.csv")
                 else:
@@ -78,22 +77,22 @@ if ss.get("logged_in"):
 
         if ss.get("role") == "admin":
             uploaded = st.file_uploader("Upload photo or video", type=["png", "jpg", "jpeg", "mp4", "mov"])
-
             if uploaded:
                 os.makedirs("gallery", exist_ok=True)
                 save_path = os.path.join("gallery", uploaded.name)
                 with open(save_path, "wb") as f:
                     f.write(uploaded.getbuffer())
-                st.success("✅ Photo uploaded!")
+                st.success("✅ File uploaded!")
 
-           if os.path.exists("gallery"):
-               files = [f for f in os.listdir("gallery") if f.lower().endswith((".png", ".jpg", ".jpeg", ".mp4", ".mov"))]
-               for file in files:
-                   path = os.path.join("gallery", file)
-                   if file.lower().endswith((".mp4", ".mov")):
-                       st.video(path)
-                    else:
-                        st.image(path, use_column_width=True)
-                        
-                
-
+        if os.path.exists("gallery"):
+            files = [f for f in os.listdir("gallery") if f.lower().endswith((".png", ".jpg", ".jpeg", ".mp4", ".mov"))]
+            for file in files:
+                path = os.path.join("gallery", file)
+                if file.lower().endswith((".mp4", ".mov")):
+                    st.video(path, use_container_width=True)
+                else:
+                    st.image(path, use_container_width=True)
+        else:
+            st.info("No gallery files yet.")
+else:
+    st.warning("🔒 Please log in to access the portal.")
