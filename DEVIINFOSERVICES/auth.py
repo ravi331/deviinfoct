@@ -4,8 +4,18 @@ from utils import load_csv, normalize_number, safe_path
 
 def login_sidebar():
     ss = st.session_state
-    allowed_df = load_csv(safe_path("allowed_users.csv"), ["mobile_number", "name", "role"])
+   
+    allowed_df = pd.read_csv("allowed_users.csv")
     allowed_df["mobile_number"] = normalize_number(allowed_df["mobile_number"])
+
+    mobile = normalize_number(pd.Series([entered_number])).iloc[0]
+
+# 🔍 Debug output
+    st.write("Entered:", mobile)
+    st.write("Allowed:", allowed_df["mobile_number"].tolist())
+
+    match = allowed_df[allowed_df["mobile_number"] == mobile]
+
 
     st.sidebar.title("Login")
     if not ss.get("logged_in"):
@@ -32,3 +42,4 @@ def login_sidebar():
             for k in ["logged_in", "mobile", "otp", "welcomed", "admin_logged_in", "role"]:
                 ss.pop(k, None)
             st.experimental_rerun()
+
