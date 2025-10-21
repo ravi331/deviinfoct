@@ -86,12 +86,14 @@ if ss.get("logged_in"):
                     f.write(uploaded.getbuffer())
                 st.success("✅ Photo uploaded!")
 
-       if os.path.exists("gallery"):
-           files = [f for f in os.listdir("gallery") if f.lower().endswith((".png", ".jpg", ".jpeg", ".mp4", ".mov"))]
-           for file in files:
-               path = os.path.join("gallery", file)
-               if file.lower().endswith((".mp4", ".mov")):
-                   st.video(path)
-                else:
-                    st.image(path, use_column_width=True)
+           if os.path.exists("gallery"):
+               files = [f for f in os.listdir("gallery") if f.lower().endswith((".png", ".jpg", ".jpeg", ".mp4", ".mov"))]
+               for file in files:
+                   path = os.path.join("gallery", file)
+                   if file.lower().endswith((".mp4", ".mov")):
+                       st.video(path)
+                    else:
+                        st.image(path, use_column_width=True)
+                        
                 
+
