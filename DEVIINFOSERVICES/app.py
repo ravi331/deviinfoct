@@ -13,8 +13,11 @@ ss = st.session_state
 # Logout button
 if ss.get("logged_in"):
     if st.sidebar.button("Logout"):
-        st.session_state.clear()
-        st.experimental_rerun()
+        for key in list(st.session_state.keys()):
+            del st.session_state[key]
+        st.sidebar.success("🔒 Logged out successfully")
+        st.stop()  # ✅ Safe halt, no rerun error
+
 
 if ss.get("logged_in"):
     st.title("🎓 Welcome to St. Gregorios School Portal")
@@ -96,3 +99,4 @@ if ss.get("logged_in"):
             st.info("No gallery files yet.")
 else:
     st.warning("🔒 Please log in to access the portal.")
+
