@@ -9,6 +9,13 @@ from registration import register_student
 st.set_page_config(page_title="Annual Day Portal", layout="wide")
 login_sidebar()
 ss = st.session_state
+if ss.get("logged_in"):
+    if st.sidebar.button("Logout"):
+        for key in list(st.session_state.keys()):
+            del st.session_state[key]
+        st.sidebar.success("🔒 Logged out successfully")
+        st.stop()
+
 
 if ss.get("logged_in"):
     st.title("🎓 Welcome to St. Gregorios School Portal")
@@ -85,3 +92,4 @@ if ss.get("logged_in"):
             st.info("No gallery images yet.")
 else:
     st.warning("🔒 Please log in to access the portal.")
+
