@@ -12,14 +12,12 @@ ss = st.session_state
 
 if ss.get("logged_in"):
     st.title("🎓 Welcome to St. Gregorios School Portal")
-    st.success(f"Logged in as: {ss.mobile} ({ss.role})")
+    st.success(f"Logged in as: {ss.name} ({ss.role})")
 
     # Mascot logo
     mascot_path = os.path.join("images", "mascot.png")
     if os.path.exists(mascot_path):
         st.image(mascot_path, width=250)
-    else:
-        st.warning("Mascot image not found.")
 
     # Countdown to 20 Dec 2025, 6:00 PM
     event_date = datetime(2025, 12, 20, 18, 0)
@@ -65,8 +63,6 @@ if ss.get("logged_in"):
                     st.download_button("Download CSV", data=csv_data, file_name="registrations.csv")
                 else:
                     st.info("No registrations yet.")
-            else:
-                st.info("No registrations found.")
 
     # Gallery tab
     with tabs[3]:
